@@ -1,25 +1,57 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { Camera, Package, AlertTriangle, CheckCircle, Clock } from "lucide-react";
+import { Camera, Package, AlertTriangle, CheckCircle, Clock, Upload, X, Plus } from "lucide-react";
 import { mockInventory } from "@/data/mockData";
-import { ShimmerButton } from "@/components/animated/ShimmerButton";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Inventory() {
   const [scanDialogOpen, setScanDialogOpen] = useState(false);
+  const [scanStep, setScanStep] = useState<"upload" | "review">("upload");
+  const [shopName, setShopName] = useState("");
+  const [detectedItems, setDetectedItems] = useState<string[]>([]);
+  const [newItem, setNewItem] = useState("");
   const { toast } = useToast();
 
-  const handleScan = () => {
+  const handleStartScan = () => {
     setScanDialogOpen(true);
-    // Simulate scanning process
-    setTimeout(() => {
-      setScanDialogOpen(false);
-      toast({
-        title: "Scan Complete!",
-        description: "Successfully added 3 items to your inventory",
-      });
-    }, 2000);
+    setScanStep("upload");
+    setShopName("");
+    setDetectedItems([]);
+    setNewItem("");
+  };
+
+  const handleAnalyze = () => {
+    // Mock detected items
+    setScanStep("review");
+    setDetectedItems([
+      "Miniket Rice - 5kg",
+      "Soybean Oil - 2L",
+      "Red Lentils - 1kg",
+      "Onions - 2kg"
+    ]);
+  };
+
+  const handleDeleteItem = (index: number) => {
+    setDetectedItems(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleAddNewItem = () => {
+    if (newItem.trim()) {
+      setDetectedItems(prev => [...prev, newItem]);
+      setNewItem("");
+    }
+  };
+
+  const handleConfirmAdd = () => {
+    setScanDialogOpen(false);
+    toast({
+      title: "Items Added!",
+      description: `Successfully added ${detectedItems.length} items to your inventory`,
+    });
   };
 
   const getStatusIcon = (status: string) => {
@@ -68,10 +100,13 @@ export default function Inventory() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <ShimmerButton onClick={handleScan}>
+            <Button 
+              onClick={handleStartScan}
+              className="gradient-primary text-white hover:opacity-90 transition-opacity"
+            >
               <Camera className="mr-2 h-5 w-5" />
               Scan Shopping
-            </ShimmerButton>
+            </Button>
           </motion.div>
         </div>
 
@@ -147,20 +182,100 @@ export default function Inventory() {
 
         {/* Scan Dialog */}
         <Dialog open={scanDialogOpen} onOpenChange={setScanDialogOpen}>
-          <DialogContent>
+          <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Scanning Receipt</DialogTitle>
+              <DialogTitle>
+                {scanStep === "upload" ? "Upload Receipt" : "Review Detected Items"}
+              </DialogTitle>
             </DialogHeader>
-            <div className="flex flex-col items-center justify-center py-8">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                className="mb-4"
-              >
-                <Camera className="h-16 w-16 text-primary" />
-              </motion.div>
-              <p className="text-muted-foreground">Analyzing your shopping receipt...</p>
-            </div>
+
+            {scanStep === "upload" && (
+              <div className="space-y-4">
+                {/* Dropzone */}
+                <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer">
+                  <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Click to upload or drag and drop
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    PNG, JPG or PDF (MAX. 5MB)
+                  </p>
+                </div>
+
+                {/* Shop Name (Optional) */}
+                <div className="space-y-2">
+                  <Label htmlFor="shopName">Shop Name (Optional)</Label>
+                  <Input
+                    id="shopName"
+                    placeholder="e.g., Agora Supermarket"
+                    value={shopName}
+                    onChange={(e) => setShopName(e.target.value)}
+                  />
+                </div>
+
+                <Button 
+                  onClick={handleAnalyze}
+                  className="w-full gradient-primary text-white hover:opacity-90 transition-opacity"
+                >
+                  Analyze Receipt
+                </Button>
+              </div>
+            )}
+
+            {scanStep === "review" && (
+              <div className="space-y-4">
+                {/* Detected Items List */}
+                <div className="border rounded-lg p-4 max-h-64 overflow-y-auto">
+                  <AnimatePresence>
+                    {detectedItems.map((item, index) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 20 }}
+                        className="flex items-center justify-between py-2 border-b last:border-0"
+                      >
+                        <span className="text-sm">{item}</span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteItem(index)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+
+                {/* Add Missing Item */}
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Add missing item..."
+                    value={newItem}
+                    onChange={(e) => setNewItem(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && handleAddNewItem()}
+                  />
+                  <Button
+                    onClick={handleAddNewItem}
+                    disabled={!newItem.trim()}
+                    className="gradient-primary text-white hover:opacity-90 transition-opacity"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                <DialogFooter>
+                  <Button
+                    onClick={handleConfirmAdd}
+                    disabled={detectedItems.length === 0}
+                    className="w-full gradient-primary text-white hover:opacity-90 transition-opacity"
+                  >
+                    Add {detectedItems.length} Items to Inventory
+                  </Button>
+                </DialogFooter>
+              </div>
+            )}
           </DialogContent>
         </Dialog>
       </div>

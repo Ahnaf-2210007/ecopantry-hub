@@ -154,7 +154,7 @@ export default function Landing() {
             transition={{ duration: 0.8, delay: 0.6 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
-            <Link to="/dashboard">
+            <Link to="/login">
               <ShimmerButton className="px-8 py-4 text-lg">
                 Get Started Free
                 <ArrowRight className="ml-2 inline h-5 w-5" />

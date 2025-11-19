@@ -29,7 +29,7 @@ export default function Dashboard() {
             className="lg:col-span-2"
           >
             <BorderBeam>
-              <div className="p-8">
+              <div className="p-8 bg-white border border-slate-100 shadow-sm">
                 <div className="flex items-start justify-between mb-6">
                   <div>
                     <h3 className="font-heading text-2xl font-semibold mb-2">Green Score</h3>
@@ -117,11 +117,11 @@ export default function Dashboard() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
-              className="card-hover-gradient p-6"
+              className="card-hover-gradient p-6 bg-white border border-slate-100 shadow-sm"
             >
               <div className="flex items-center gap-4 mb-4">
-                <div className="rounded-xl bg-primary/10 p-3">
-                  <Package className="h-6 w-6 text-primary" />
+                <div className="rounded-xl bg-emerald-100 p-3">
+                  <Package className="h-6 w-6 text-emerald-700" />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Total Items</p>
@@ -134,11 +134,11 @@ export default function Dashboard() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3 }}
-              className="card-hover-gradient p-6"
+              className="card-hover-gradient p-6 bg-white border border-slate-100 shadow-sm"
             >
               <div className="flex items-center gap-4 mb-4">
-                <div className="rounded-xl bg-accent/10 p-3">
-                  <AlertTriangle className="h-6 w-6 text-accent" />
+                <div className="rounded-xl bg-amber-100 p-3">
+                  <AlertTriangle className="h-6 w-6 text-amber-700" />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Expiring Soon</p>
@@ -151,11 +151,11 @@ export default function Dashboard() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.4 }}
-              className="card-hover-gradient p-6"
+              className="card-hover-gradient p-6 bg-white border border-slate-100 shadow-sm"
             >
               <div className="flex items-center gap-4 mb-4">
-                <div className="rounded-xl bg-destructive/10 p-3">
-                  <AlertTriangle className="h-6 w-6 text-destructive" />
+                <div className="rounded-xl bg-red-100 p-3">
+                  <AlertTriangle className="h-6 w-6 text-red-700" />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Expired</p>
@@ -171,7 +171,7 @@ export default function Dashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="card-hover-gradient p-6"
+          className="card-hover-gradient p-6 bg-white border border-slate-100 shadow-sm"
         >
           <h3 className="font-heading text-2xl font-semibold mb-6">Recent Activity</h3>
           

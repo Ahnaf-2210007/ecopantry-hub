@@ -1,12 +1,43 @@
 import { motion } from "framer-motion";
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Leaf, LayoutDashboard, Package, UtensilsCrossed, BookOpen, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ShimmerButton } from "./animated/ShimmerButton";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter, SheetTrigger } from "@/components/ui/sheet";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 
 export const Navigation = () => {
   const location = useLocation();
+  const { toast } = useToast();
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [itemName, setItemName] = useState("");
+  const [category, setCategory] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const [expiryDate, setExpiryDate] = useState("");
+  
   const isActive = (path: string) => location.pathname === path;
+  
+  // Hide navigation on landing and auth pages
+  const hideNav = location.pathname === "/" || location.pathname === "/login" || location.pathname === "/register";
+  
+  const handleSaveItem = () => {
+    toast({
+      title: "Item Added!",
+      description: `${itemName} has been added to your inventory.`,
+    });
+    setSheetOpen(false);
+    // Reset form
+    setItemName("");
+    setCategory("");
+    setQuantity("");
+    setExpiryDate("");
+  };
+  
+  if (hideNav) return null;
 
   const navItems = [
     { path: "/", label: "Home", icon: Leaf },
@@ -68,12 +99,76 @@ export const Navigation = () => {
             })}
           </div>
 
-          {/* CTA Button */}
+          {/* Add Item Sheet */}
           <div className="hidden md:block">
-            <ShimmerButton className="px-6 py-2">
-              <Plus className="mr-2 inline h-4 w-4" />
-              Add Item
-            </ShimmerButton>
+            <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+              <SheetTrigger asChild>
+                <Button className="gradient-primary text-white hover:opacity-90 transition-opacity">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Item
+                </Button>
+              </SheetTrigger>
+              <SheetContent>
+                <SheetHeader>
+                  <SheetTitle>Add Manual Item</SheetTitle>
+                </SheetHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Item Name</Label>
+                    <Input
+                      id="name"
+                      placeholder="e.g., Miniket Rice"
+                      value={itemName}
+                      onChange={(e) => setItemName(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="category">Category</Label>
+                    <Select value={category} onValueChange={setCategory}>
+                      <SelectTrigger id="category">
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="grains">Grains</SelectItem>
+                        <SelectItem value="vegetables">Vegetables</SelectItem>
+                        <SelectItem value="fruits">Fruits</SelectItem>
+                        <SelectItem value="dairy">Dairy</SelectItem>
+                        <SelectItem value="meat">Meat & Fish</SelectItem>
+                        <SelectItem value="spices">Spices</SelectItem>
+                        <SelectItem value="snacks">Snacks</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="quantity">Quantity</Label>
+                    <Input
+                      id="quantity"
+                      placeholder="e.g., 2 kg"
+                      value={quantity}
+                      onChange={(e) => setQuantity(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="expiry">Expiry Date</Label>
+                    <Input
+                      id="expiry"
+                      type="date"
+                      value={expiryDate}
+                      onChange={(e) => setExpiryDate(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <SheetFooter>
+                  <Button 
+                    onClick={handleSaveItem}
+                    disabled={!itemName || !category || !quantity || !expiryDate}
+                    className="w-full gradient-primary text-white hover:opacity-90 transition-opacity"
+                  >
+                    Save Item
+                  </Button>
+                </SheetFooter>
+              </SheetContent>
+            </Sheet>
           </div>
 
           {/* Mobile Menu Button */}
