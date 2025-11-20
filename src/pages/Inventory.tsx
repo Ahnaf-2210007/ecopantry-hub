@@ -1,11 +1,12 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { Camera, Package, AlertTriangle, CheckCircle, Clock, Upload, X, Plus } from "lucide-react";
+import { Camera, Package, AlertTriangle, CheckCircle, Clock, Upload, X, Plus, Search, Filter } from "lucide-react";
 import { mockInventory } from "@/data/mockData";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Inventory() {
@@ -14,6 +15,9 @@ export default function Inventory() {
   const [shopName, setShopName] = useState("");
   const [detectedItems, setDetectedItems] = useState<string[]>([]);
   const [newItem, setNewItem] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("expiry");
   const { toast } = useToast();
 
   const handleStartScan = () => {
@@ -81,7 +85,7 @@ export default function Inventory() {
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-12">
+    <div className="min-h-screen pt-24 pb-12 bg-slate-50">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
@@ -94,12 +98,52 @@ export default function Inventory() {
               {mockInventory.length} items • {mockInventory.filter(i => i.status === "expiring").length} expiring soon
             </p>
           </motion.div>
+        </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
+        {/* Toolbar */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="mb-6 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between bg-white p-4 rounded-lg border border-slate-100 shadow-sm"
+        >
+          <div className="relative flex-1 w-full md:max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search pantry..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+
+          <div className="flex flex-wrap gap-2 items-center">
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="w-[140px]">
+                <Filter className="mr-2 h-4 w-4" />
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Items</SelectItem>
+                <SelectItem value="grains">Grains</SelectItem>
+                <SelectItem value="vegetables">Vegetables</SelectItem>
+                <SelectItem value="fruits">Fruits</SelectItem>
+                <SelectItem value="dairy">Dairy</SelectItem>
+                <SelectItem value="meat">Meat & Fish</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="expiry">Expiry Date</SelectItem>
+                <SelectItem value="name">Name</SelectItem>
+                <SelectItem value="category">Category</SelectItem>
+              </SelectContent>
+            </Select>
+
             <Button 
               onClick={handleStartScan}
               className="gradient-primary text-white hover:opacity-90 transition-opacity"
@@ -107,8 +151,8 @@ export default function Inventory() {
               <Camera className="mr-2 h-5 w-5" />
               Scan Shopping
             </Button>
-          </motion.div>
-        </div>
+          </div>
+        </motion.div>
 
         {/* Inventory Table */}
         <motion.div

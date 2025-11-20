@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Leaf, LayoutDashboard, Package, UtensilsCrossed, BookOpen, Plus } from "lucide-react";
+import { Leaf, LayoutDashboard, Package, UtensilsCrossed, BookOpen, Plus, User, Upload } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter, SheetTrigger } from "@/components/ui/sheet";
@@ -18,11 +18,13 @@ export const Navigation = () => {
   const [category, setCategory] = useState("");
   const [quantity, setQuantity] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
+  const [cost, setCost] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
   
   const isActive = (path: string) => location.pathname === path;
   
   // Hide navigation on landing and auth pages
-  const hideNav = location.pathname === "/" || location.pathname === "/login" || location.pathname === "/register";
+  const hideNav = location.pathname === "/" || location.pathname === "/login" || location.pathname === "/register" || location.pathname === "/profile";
   
   const handleSaveItem = () => {
     toast({
@@ -35,6 +37,8 @@ export const Navigation = () => {
     setCategory("");
     setQuantity("");
     setExpiryDate("");
+    setCost("");
+    setImageFile(null);
   };
   
   if (hideNav) return null;
@@ -45,6 +49,7 @@ export const Navigation = () => {
     { path: "/inventory", label: "Inventory", icon: Package },
     { path: "/consumptions", label: "Meal Log", icon: UtensilsCrossed },
     { path: "/resources", label: "Resources", icon: BookOpen },
+    { path: "/profile", label: "Profile", icon: User },
   ];
 
   return (
@@ -113,6 +118,27 @@ export const Navigation = () => {
                   <SheetTitle>Add Manual Item</SheetTitle>
                 </SheetHeader>
                 <div className="space-y-4 py-4">
+                  {/* Image Upload */}
+                  <div className="space-y-2">
+                    <Label>Item Image (Optional)</Label>
+                    <label 
+                      htmlFor="image-upload" 
+                      className="flex flex-col items-center justify-center h-32 border-2 border-dashed border-slate-300 rounded-lg cursor-pointer hover:border-primary transition-colors bg-slate-50"
+                    >
+                      <Upload className="h-6 w-6 text-muted-foreground mb-2" />
+                      <span className="text-sm text-muted-foreground">
+                        {imageFile ? imageFile.name : "Tap to upload image"}
+                      </span>
+                      <input
+                        id="image-upload"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+                      />
+                    </label>
+                  </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="name">Item Name</Label>
                     <Input
@@ -155,6 +181,16 @@ export const Navigation = () => {
                       type="date"
                       value={expiryDate}
                       onChange={(e) => setExpiryDate(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="cost">Cost (৳)</Label>
+                    <Input
+                      id="cost"
+                      type="number"
+                      placeholder="e.g., 250"
+                      value={cost}
+                      onChange={(e) => setCost(e.target.value)}
                     />
                   </div>
                 </div>

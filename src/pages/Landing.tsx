@@ -292,7 +292,7 @@ export default function Landing() {
           <p className="mx-auto mb-8 max-w-2xl text-xl text-white/90">
             Join thousands of users who are already reducing food waste and saving money
           </p>
-          <Link to="/dashboard">
+          <Link to="/register">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
